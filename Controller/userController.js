@@ -19,11 +19,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //hash password
     const hashedPassword = await bcrypt.hash(password, 10)
+    console.log("hashed Password: ", hashedPassword)
     const user = await User.create({
         username,
         email,
         password: hashedPassword
     });
+    console.log(`User Created ${user}`)
     if (user) {
         res.status(201).json({ message: "Register successfully", _id: user.id, email: user.email })
     } else {
@@ -50,7 +52,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 id: user.id
             }
         }, process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "1m" }
+            { expiresIn: "15m" }
         )
         res.status(200).json({ message: "login successfully", accessToken: accessToken })
     } else {
@@ -63,7 +65,6 @@ const loginUser = asyncHandler(async (req, res) => {
 //@route POST /contacts/current
 //@access private
 const currentUser = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.params.id)
-    res.json(user)
+    res.json(req.user)
 })
 module.exports = { registerUser, loginUser, currentUser }
